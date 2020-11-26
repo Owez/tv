@@ -134,4 +134,4 @@ def index():
 
 if __name__ == "__main__":
     batch_add_loop()  # loop batch adder
-    app.run(debug=True)
+    app.run()
