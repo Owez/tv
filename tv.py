@@ -5,7 +5,9 @@ import threading
 import logging
 import json
 import sys
+import random
 from pathlib import Path
+from flask import Flask, render_template
 
 """Path to configuration file"""
 CONFIG_PATH = Path("config.json")
@@ -26,6 +28,9 @@ class Config:
 
 
 config = Config()
+
+#### REDDIT #####
+
 reddit = praw.Reddit(
     client_id=config.reddit_client_id,
     client_secret=config.reddit_client_secret,
@@ -76,7 +81,7 @@ class Posts:
                 continue
 
             logging.info(f"Adding post '{submission.title}' from {submission.url}")
-            self.add_post(submission.title, submission.url)
+            self.add_post(submission.title, submission.url.split("/")[-1])
 
         if len(self.database) > 50000:
             # cull if too large
@@ -86,6 +91,12 @@ class Posts:
             self.database = dict(list(self.database.items())[: len(self.database) // 2])
 
         self.save_database()
+
+    def random(self):
+        """Gets random post from database"""
+
+        # TODO: tie to user session with seperate db
+        return random.choice(list(self.database.items()))
 
 
 posts = Posts()
@@ -111,5 +122,16 @@ def batch_add_loop():
     thread.start()
 
 
+#### FLASK ####
+
+app = Flask(__name__)
+
+
+@app.route("/")
+def index():
+    return render_template("index.html", post=posts.random())
+
+
 if __name__ == "__main__":
     batch_add_loop()  # loop batch adder
+    app.run(debug=True)
