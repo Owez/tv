@@ -73,7 +73,7 @@ class Posts:
     def add_batch(self):
         """Adds new batch of posts"""
 
-        for submission in subreddit.relevance(limit=100):
+        for submission in subreddit.hot(limit=250):
             if not (
                 submission.url.startswith("https://youtu.be/")
                 or submission.url.startswith("https://www.youtube.com/")
