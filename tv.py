@@ -73,7 +73,7 @@ class Posts:
     def add_batch(self):
         """Adds new batch of posts"""
 
-        for submission in subreddit.hot(limit=15):
+        for submission in subreddit.hot(limit=250):
             if (
                 not (
                     submission.url.startswith("https://youtu.be/")
@@ -98,10 +98,10 @@ class Posts:
                     f"Could not add '{submission.title}' from {submission.url}'"
                 )
 
-        if len(self.database) > 50000:
+        if len(self.database) > 500:
             # cull if too large
             logging.warn(
-                "Culling database to 25k (deleting oldest half) as it's over 50k entries long"
+                "Culling database to 250 (deleting oldest half) as it's over 500 entries long"
             )
             self.database = dict(list(self.database.items())[: len(self.database) // 2])
 
