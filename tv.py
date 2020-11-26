@@ -74,14 +74,30 @@ class Posts:
         """Adds new batch of posts"""
 
         for submission in subreddit.hot(limit=250):
-            if not (
-                submission.url.startswith("https://youtu.be/")
-                or submission.url.startswith("https://www.youtube.com/")
+            if (
+                not (
+                    submission.url.startswith("https://youtu.be/")
+                    or submission.url.startswith("https://www.youtube.com/")
+                )
+                or subreddit.over18
             ):
                 continue
 
             logging.info(f"Adding post '{submission.title}' from {submission.url}")
-            self.add_post(submission.title, submission.url.split("/")[-1])
+
+            try:
+                raw_id = (
+                    submission.url.split("/")[-1]
+                    .strip("watch?v=")
+                    .split("&")[0]
+                    .split("?")[0]
+                )
+
+                self.add_post(submission.title, raw_id)
+            except:
+                logging.error(
+                    f"Could not add '{submission.title}' from {submission.url}'"
+                )
 
         if len(self.database) > 50000:
             # cull if too large
@@ -95,7 +111,6 @@ class Posts:
     def random(self):
         """Gets random post from database"""
 
-        # TODO: tie to user session with seperate db
         return random.choice(list(self.database.items()))
 
 
