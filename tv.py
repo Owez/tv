@@ -73,7 +73,7 @@ class Posts:
     def add_batch(self):
         """Adds new batch of posts"""
 
-        for submission in subreddit.hot(limit=250):
+        for submission in subreddit.hot(limit=15):
             if (
                 not (
                     submission.url.startswith("https://youtu.be/")
@@ -86,14 +86,13 @@ class Posts:
             logging.info(f"Adding post '{submission.title}' from {submission.url}")
 
             try:
-                raw_id = (
+                self.add_post(
+                    submission.title,
                     submission.url.split("/")[-1]
-                    .strip("watch?v=")
-                    .split("&")[0]
+                    .split("v=")[-1]
                     .split("?")[0]
+                    .split("&")[0],
                 )
-
-                self.add_post(submission.title, raw_id)
             except:
                 logging.error(
                     f"Could not add '{submission.title}' from {submission.url}'"
